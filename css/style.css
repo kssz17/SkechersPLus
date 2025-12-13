@@ -1,0 +1,12 @@
+body {
+    font-family: 'Arial', sans-serif;
+}
+
+/* Botón de agregar al carrito animado */
+.add-to-cart {
+    transition: transform 0.2s;
+}
+
+.add-to-cart:hover {
+    transform: scale(1.05);
+}
