@@ -1,9 +1,9 @@
 <?php
 // Configuración de la base de datos
-define('DB_HOST', 'sql102.infinityfree.com');
-define('DB_NAME', 'if0_40640194_skechersplus');
-define('DB_USER', 'if0_40640194');
-define('DB_PASS', 'Wilteamo07');
+define('DB_HOST', 'DB_HOST');
+define('DB_NAME', 'DB_NAME');
+define('DB_USER', 'DB_USER');
+define('DB_PASS', 'DB_PASS');
 
 function getDB() {
     try {
