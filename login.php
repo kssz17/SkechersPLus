@@ -75,7 +75,6 @@
 document.getElementById('loginForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const form = e.target;
     const submitBtn = document.getElementById('submitBtn');
     const messageContainer = document.getElementById('messageContainer');
     
@@ -85,73 +84,75 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
     
     // Validación básica
     if (!email || !password) {
-        messageContainer.innerHTML = '<p class="text-red-600 text-sm">Por favor completa todos los campos</p>';
+        showMessage('Por favor completa todos los campos', 'error');
+        return;
+    }
+    
+    // Validar email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showMessage('Por favor ingresa un email válido', 'error');
         return;
     }
     
     // Cambiar estado del botón
     submitBtn.disabled = true;
     submitBtn.textContent = 'Verificando...';
-    messageContainer.innerHTML = '<p class="text-blue-600 text-sm">Verificando credenciales...</p>';
-    
-    // Crear FormData
-    const formData = new FormData();
-    formData.append('action', 'login');
-    formData.append('email', email);
-    formData.append('password', password);
+    showMessage('Verificando credenciales...', 'info');
     
     try {
-        // IMPORTANTE: Usar auth_api.php (archivo SEPARADO)
-        const res = await fetch('auth_api.php', {
+        // Enviar datos al servidor
+        const formData = new FormData();
+        formData.append('action', 'login');
+        formData.append('email', email);
+        formData.append('password', password);
+        
+        const response = await fetch('auth_api.php', {
             method: 'POST',
             body: formData
         });
         
-        console.log('Status:', res.status);
+        const data = await response.json();
         
-        const text = await res.text();
-        console.log('Respuesta texto:', text);
-        
-        let data;
-        try {
-            data = JSON.parse(text);
-        } catch (parseError) {
-            console.error('Error parseando JSON:', parseError);
-            messageContainer.innerHTML = '<p class="text-red-600 text-sm">Error en la respuesta del servidor</p>';
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Entrar';
-            return;
-        }
-        
-        console.log('Respuesta JSON:', data);
+        console.log('Respuesta del servidor:', data);
         
         if (data.success) {
-            messageContainer.innerHTML = '<p class="text-green-600 text-sm">¡Inicio de sesión exitoso!</p>';
+            showMessage(data.message || '¡Inicio de sesión exitoso!', 'success');
             
-            // Redirigir
+            // Redirigir después de 1 segundo
             setTimeout(() => {
                 window.location.href = 'index.php';
             }, 1000);
             
         } else {
-            messageContainer.innerHTML = `<p class="text-red-600 text-sm">${data.message || 'Usuario o contraseña incorrectos'}</p>`;
+            showMessage(data.message || 'Error en el inicio de sesión', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Entrar';
         }
         
     } catch (error) {
-        console.error('Error en login:', error);
-        messageContainer.innerHTML = `<p class="text-red-600 text-sm">Error de conexión: ${error.message}</p>`;
+        console.error('Error en la solicitud:', error);
+        showMessage('Error de conexión con el servidor', 'error');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Entrar';
     }
 });
 
+function showMessage(message, type = 'info') {
+    const messageContainer = document.getElementById('messageContainer');
+    
+    let colorClass = 'text-blue-600';
+    if (type === 'error') colorClass = 'text-red-600';
+    if (type === 'success') colorClass = 'text-green-600';
+    
+    messageContainer.innerHTML = `<p class="${colorClass} text-sm font-medium">${message}</p>`;
+}
+
 // Menú móvil
-const btn = document.getElementById('menu-btn');
+const menuBtn = document.getElementById('menu-btn');
 const menu = document.getElementById('menu');
-if (btn && menu) {
-    btn.addEventListener('click', () => {
+if (menuBtn && menu) {
+    menuBtn.addEventListener('click', () => {
         menu.classList.toggle('hidden');
     });
 }

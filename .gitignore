@@ -1,3 +1,5 @@
 .env
-config.local.php
+config/config.local.php
+config/config.prod.php
+auth_debug.log
 .idea/
